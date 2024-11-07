@@ -52,6 +52,7 @@ def extract_image_data(cam_dir, foreground_dir, step=1, start_index=0, num_image
 
 def main():
     argparser = argparse.ArgumentParser()
+    argparser.add_argument('--data_path', type=str, required=True)
     args = argparser.parse_args()
     data_path = args.data_path
     data_list = os.listdir(data_path)

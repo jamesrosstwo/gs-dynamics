@@ -194,7 +194,7 @@ if __name__ == "__main__":
     text_threshold = 0.25
     device = "cuda"
 
-    for seq in os.listdir(data_path):
+    for seq in os.listdir(data_path)[::-1]:
         image_path = os.path.join(data_path, seq)
         output_dir = image_path + "/seg"
         os.makedirs(output_dir, exist_ok=True)

@@ -71,6 +71,7 @@ def process_images(data_path):
 
 if __name__ == "__main__":
     argparser = argparse.ArgumentParser()
+    argparser.add_argument('--data_path', type=str, help='Path to your data file')
     args = argparser.parse_args()
     data_path = args.data_path
     for i in range(0, 4):
