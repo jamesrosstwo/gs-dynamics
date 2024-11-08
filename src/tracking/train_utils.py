@@ -4,8 +4,11 @@ import copy
 from PIL import Image
 from random import randint
 from diff_gaussian_rasterization import GaussianRasterizer as Renderer
-from helpers import setup_camera, l1_loss_v1, l1_loss_v2, weighted_l2_loss_v1, weighted_l2_loss_v2, quat_mult, o3d_knn, params2rendervar
+from helpers import setup_camera, l1_loss_v1, l1_loss_v2, weighted_l2_loss_v1, weighted_l2_loss_v2, quat_mult, o3d_knn, \
+    params2rendervar
 from external import calc_ssim, calc_psnr, build_rotation, update_params_and_optimizer
+from src.definitions import ROOT_PATH
+
 
 def map_to_segmentation_path(img_path):
     # Split the path into directory and filename
@@ -17,6 +20,7 @@ def map_to_segmentation_path(img_path):
     seg_path = f'{directory}/seg/{seg_filename}'
 
     return seg_path
+
 
 def map_to_depth_path(img_path):
     # Split the path into directory and filename
@@ -42,40 +46,42 @@ def get_custom_dataset(t, md, seq):
     - dataset: a list of dictionaries where each dictionary corresponds to an image 
                and its associated segmentation along with other related data.
     """
-    
+
     dataset = []
-    
+
     # Loop over filenames corresponding to 't' in the metadata
     for c in range(len(md['fn'][t])):
-
         # print(f"Processing image {c} of {len(md['fn'][t])}")
-        
+
         # Extract parameters from the metadata
-        w, h = md['w'], md['h']                # Width and height of the images
-        k = md['k'][t][c]                      # Camera parameter for the current image
-        w2c = md['w2c'][t][c]                  # Another camera parameter for the current image
-        
+        w, h = md['w'], md['h']  # Width and height of the images
+        k = md['k'][t][c]  # Camera parameter for the current image
+        w2c = md['w2c'][t][c]  # Another camera parameter for the current image
+
         # Set up a camera using extracted parameters and some default values
         cam = setup_camera(w, h, k, w2c, near=1.0, far=100)
-        
+
         # Get the filename of the current image and open it
         fn = md['fn'][t][c]
 
-        im = np.array(copy.deepcopy(Image.open(f"./data/{seq}/{fn}")))
-        
+        img_path = ROOT_PATH / f"data/{seq}/{fn}"
+        im = np.array(copy.deepcopy(Image.open(str(img_path))))
+
         # Convert the image to a PyTorch tensor, move to GPU and normalize values to [0, 1]
         im = torch.tensor(im).float().cuda().permute(2, 0, 1) / 255
-        
+
         # Open the corresponding segmentation image and convert it to a tensor
         seg_path = map_to_segmentation_path(fn)
-        seg = np.array(copy.deepcopy(Image.open(f"./data/{seq}/{seg_path}"))).astype(np.float32)
+
+        full_seg_path = ROOT_PATH / f"data/{seq}/{seg_path}"
+        seg = np.array(copy.deepcopy(Image.open(str(full_seg_path)))).astype(np.float32)
         seg = torch.tensor(seg).float().cuda()
-        
+
         # Create a color segmentation tensor. It seems to treat the segmentation as binary (object/background)
         seg_col = torch.stack((seg, torch.zeros_like(seg), 1 - seg))
 
         dataset.append({'cam': cam, 'im': im, 'seg': seg_col, 'id': c})
-        
+
     return dataset
 
 
@@ -101,7 +107,9 @@ def initialize_params(seq, md, init_pt_cld_path):
     """
 
     # Load the initial point cloud data from the given path.
-    init_pt_cld = np.load(f"./data/{seq}/{init_pt_cld_path}")["data"]  # for custom dataset
+
+    pcd_path = ROOT_PATH / f"data/{seq}/{init_pt_cld_path}"
+    init_pt_cld = np.load(str(pcd_path))["data"]  # for custom dataset
 
     # Extract the segmentation data.
     seg = init_pt_cld[:, 6]
@@ -117,14 +125,14 @@ def initialize_params(seq, md, init_pt_cld_path):
 
     # Initialize various parameters related to the 3D point cloud.
     params = {
-        'means3D': init_pt_cld[:, :3],                          # 3D coordinates of the points.
-        'rgb_colors': init_pt_cld[:, 3:6],                      # RGB color values for the points.
+        'means3D': init_pt_cld[:, :3],  # 3D coordinates of the points.
+        'rgb_colors': init_pt_cld[:, 3:6],  # RGB color values for the points.
         'seg_colors': np.stack((seg, np.zeros_like(seg), 1 - seg), -1),  # Segmentation colors.
         'unnorm_rotations': np.tile([1, 0, 0, 0], (seg.shape[0], 1)),  # Default rotations for each point.
-        'logit_opacities': np.zeros((seg.shape[0], 1)),         # Initial opacity values for the points.
+        'logit_opacities': np.zeros((seg.shape[0], 1)),  # Initial opacity values for the points.
         'log_scales': np.tile(np.log(np.sqrt(mean3_sq_dist))[..., None], (1, 3)),  # Scale factors for the points.
-        'cam_m': np.zeros((max_cams, 3)),                       # Placeholder for camera motion.
-        'cam_c': np.zeros((max_cams, 3)),                       # Placeholder for camera center.
+        'cam_m': np.zeros((max_cams, 3)),  # Placeholder for camera motion.
+        'cam_c': np.zeros((max_cams, 3)),  # Placeholder for camera center.
     }
 
     # Convert the params to PyTorch tensors and move them to the GPU.
@@ -140,10 +148,11 @@ def initialize_params(seq, md, init_pt_cld_path):
 
     # Initialize other associated variables.
     variables = {
-        'max_2D_radius': torch.zeros(params['means3D'].shape[0]).cuda().float(), # Maximum 2D radius.
-        'scene_radius': scene_radius,                                          # Scene radius.
-        'means2D_gradient_accum': torch.zeros(params['means3D'].shape[0]).cuda().float(), # Means2D gradient accumulator.
-        'denom': torch.zeros(params['means3D'].shape[0]).cuda().float()        # Denominator.
+        'max_2D_radius': torch.zeros(params['means3D'].shape[0]).cuda().float(),  # Maximum 2D radius.
+        'scene_radius': scene_radius,  # Scene radius.
+        'means2D_gradient_accum': torch.zeros(params['means3D'].shape[0]).cuda().float(),
+        # Means2D gradient accumulator.
+        'denom': torch.zeros(params['means3D'].shape[0]).cuda().float()  # Denominator.
     }
 
     return params, variables
@@ -166,7 +175,6 @@ def initialize_optimizer(params, variables):
 
 def get_loss(params, curr_data, variables, is_initial_timestep, weight_soft_col_cons,
              weight_im, weight_seg, weight_rigid, weight_bg, weight_iso, weight_rot):
-
     # Initialize dictionary to store various loss components
     losses = {}
 
@@ -211,10 +219,10 @@ def get_loss(params, curr_data, variables, is_initial_timestep, weight_soft_col_
         # Calculate rigid, rotational, and isotropic losses
         losses['rigid'] = weighted_l2_loss_v2(curr_offset_in_prev_coord, variables["prev_offset"],
                                               variables["neighbor_weight"])
-        
+
         losses['rot'] = weighted_l2_loss_v2(rel_rot[variables["neighbor_indices"]], rel_rot[:, None],
                                             variables["neighbor_weight"])
-        
+
         curr_offset_mag = torch.sqrt((curr_offset ** 2).sum(-1) + 1e-20)
         losses['iso'] = weighted_l2_loss_v1(curr_offset_mag, variables["neighbor_dist"], variables["neighbor_weight"])
 
@@ -231,7 +239,6 @@ def get_loss(params, curr_data, variables, is_initial_timestep, weight_soft_col_
         # losses['soft_col_cons'] = l1_loss_v2(params['rgb_colors'], variables["prev_col"])
         losses['soft_col_cons'] = 0.0
 
-
     # Define weights for each loss component
     loss_weights = {'im': weight_im, 'seg': weight_seg, 'rigid': weight_rigid, 'iso': weight_iso, 'rot': weight_rot,
                     'floor': 2.0, 'bg': weight_bg, 'soft_col_cons': weight_soft_col_cons}
@@ -246,10 +253,8 @@ def get_loss(params, curr_data, variables, is_initial_timestep, weight_soft_col_
     return loss, variables
 
 
-
 def get_loss_post(params, curr_data, variables, is_initial_timestep, weight_soft_col_cons,
-             weight_im, weight_seg, weight_rigid, weight_bg, weight_iso, weight_rot):
-
+                  weight_im, weight_seg, weight_rigid, weight_bg, weight_iso, weight_rot):
     # Initialize dictionary to store various loss components
     losses = {}
 
@@ -294,10 +299,10 @@ def get_loss_post(params, curr_data, variables, is_initial_timestep, weight_soft
         # Calculate rigid, rotational, and isotropic losses
         losses['rigid'] = weighted_l2_loss_v2(curr_offset_in_prev_coord, variables["prev_offset"],
                                               variables["neighbor_weight"])
-        
+
         losses['rot'] = weighted_l2_loss_v2(rel_rot[variables["neighbor_indices"]], rel_rot[:, None],
                                             variables["neighbor_weight"])
-        
+
         curr_offset_mag = torch.sqrt((curr_offset ** 2).sum(-1) + 1e-20)
         losses['iso'] = weighted_l2_loss_v1(curr_offset_mag, variables["neighbor_dist"], variables["neighbor_weight"])
 
@@ -314,7 +319,6 @@ def get_loss_post(params, curr_data, variables, is_initial_timestep, weight_soft
         # losses['soft_col_cons'] = l1_loss_v2(params['rgb_colors'], variables["prev_col"])
         losses['soft_col_cons'] = 0.0
 
-
     # Define weights for each loss component
     loss_weights = {'im': weight_im, 'rigid': weight_rigid, 'iso': weight_iso, 'rot': weight_rot,
                     'floor': 2.0, 'bg': weight_bg, 'soft_col_cons': weight_soft_col_cons}
@@ -327,6 +331,7 @@ def get_loss_post(params, curr_data, variables, is_initial_timestep, weight_soft
     variables['max_2D_radius'][seen] = torch.max(radius[seen], variables['max_2D_radius'][seen])
     variables['seen'] = seen
     return loss, variables
+
 
 def initialize_per_timestep(params, variables, optimizer):
     pts = params['means3D']

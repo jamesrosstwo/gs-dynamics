@@ -4,6 +4,8 @@ import open3d as o3d
 import numpy as np
 from diff_gaussian_rasterization import GaussianRasterizationSettings as Camera
 
+from src.definitions import ROOT_PATH
+
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
@@ -154,8 +156,9 @@ def save_params(output_params, seq, exp):
             to_save[k] = np.stack([params[k] for params in output_params])
         else:
             to_save[k] = output_params[0][k]
-    os.makedirs(f"./output/{exp}/{seq}", exist_ok=True)
-    np.savez(f"./output/{exp}/{seq}/params", **to_save)
+    seq_path = ROOT_PATH / f"output/{exp}/{seq}"
+    os.makedirs(str(seq_path), exist_ok=True)
+    np.savez(str(seq_path / "params"), **to_save)
 
 
 def farthest_point_sample(xyz, npoint):

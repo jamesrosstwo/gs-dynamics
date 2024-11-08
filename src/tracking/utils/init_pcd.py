@@ -172,7 +172,7 @@ def main(data_path, num_cam, t, boundaries=None, seg_flag=False):
 
 if __name__ == "__main__":
     argparser = argparse.ArgumentParser()
-    argparser.add_argument('--data_path', type=str, required=True)
+    # argparser.add_argument('--data_path', type=str, required=True)
     # argparser.add_argument('--num_cam', type=int, default=4)
     # argparser.add_argument('--t', type=int, required=True, help='timestamp')
     # argparser.add_argument('--seg_flag', default=False, help='whether to use segmentation')
