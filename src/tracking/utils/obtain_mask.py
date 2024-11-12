@@ -163,12 +163,17 @@ def process_images(images, filenames, model, text_prompt, predictor, box_thresho
         boxes_filt = boxes_filt.cpu()
         transformed_boxes = predictor.transform.apply_boxes_torch(boxes_filt, image_cv2.shape[:2]).to(device)
 
-        masks, _, _ = predictor.predict_torch(
-            point_coords = None,
-            point_labels = None,
-            boxes = transformed_boxes.to(device),
-            multimask_output = False,
-        )
+
+        try:
+            masks, _, _ = predictor.predict_torch(
+                point_coords = None,
+                point_labels = None,
+                boxes = transformed_boxes.to(device),
+                multimask_output = False,
+            )
+        except Exception as e:
+            print(e)
+            continue
 
         binary_mask = np.squeeze(masks.cpu().numpy()) > 0.5
         img = (binary_mask * 255).astype(np.uint8)
