@@ -15,7 +15,7 @@
     <option name="ADD_SOURCE_ROOTS" value="true" />
     <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
     <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/tracking/train_gs.py" />
-    <option name="PARAMETERS" value="--sequence episodes_rope/episode_00 --exp_name rope_gs_track --metadata_path train_meta.json --init_pt_cld_path=init_pt_cld_0000.npz" />
+    <option name="PARAMETERS" value="--sequence franka/episode_00 --exp_name franka_gs_track --metadata_path train_meta.json --init_pt_cld_path=init_pt_cld_0000.npz" />
     <option name="SHOW_COMMAND_LINE" value="false" />
     <option name="EMULATE_TERMINAL" value="false" />
     <option name="MODULE_MODE" value="false" />

@@ -58,12 +58,13 @@ def aggr_point_cloud_from_data(colors, depths, segs, Ks, poses, downsample=False
                             (trans_pcd[:, 2] > z_lower) &\
                                 (trans_pcd[:, 2] < z_upper)
             
-            pcd_o3d, pcd_dicts = np2o3d(trans_pcd[trans_pcd_mask], color[mask][trans_pcd_mask], seg[mask][trans_pcd_mask])
+            # pcd_o3d, pcd_dicts = np2o3d(trans_pcd[trans_pcd_mask], color[mask][trans_pcd_mask], seg[mask][trans_pcd_mask])
+            pcd_o3d, pcd_dicts = np2o3d(trans_pcd, color[mask], seg[mask])
         else:
             pcd_o3d, pcd_dicts = np2o3d(trans_pcd, color[mask], seg[mask])
         # downsample
         if downsample:
-            radius = 0.01
+            radius = 0.1
             pcd_o3d = pcd_o3d.voxel_down_sample(radius)
             idx = pcd_o3d.volume_down_sample_and_trace(radius)
             pcd_dicts = pcd_dicts[idx]
@@ -98,7 +99,7 @@ def process_point_cloud(colors, depths, segs, intrinsics, extrinsics, boundaries
     # Assuming aggr_point_cloud_from_data is a pre-defined function
     pcd, aggr_pcd_dicts = aggr_point_cloud_from_data(colors[..., ::-1], depths, segs, intrinsics, extrinsics, downsample=False, boundaries=boundaries)
     # pcd.remove_statistical_outlier(nb_neighbors=600, std_ratio=0.2)
-    pcd.remove_radius_outlier(nb_points=200, radius=0.01)
+    # pcd.remove_radius_outlier(nb_points=200, radius=0.01)
     return pcd, aggr_pcd_dicts
 
 def initialize_point_cloud_struct(aggr_pcd_dicts):
@@ -178,7 +179,7 @@ if __name__ == "__main__":
     # argparser.add_argument('--seg_flag', default=False, help='whether to use segmentation')
     args = argparser.parse_args()
     data_path = args.data_path
-    num_cam = 4
+    num_cam = 12
     seg_flag = True
     # boundaries = {'x_lower': x_lower,
     #             'x_upper': x_upper,
