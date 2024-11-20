@@ -4,7 +4,7 @@ import open3d as o3d
 import numpy as np
 from diff_gaussian_rasterization import GaussianRasterizationSettings as Camera
 
-from ..definitions import ROOT_PATH
+from src.definitions import ROOT_PATH
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 

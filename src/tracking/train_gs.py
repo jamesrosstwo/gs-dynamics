@@ -4,7 +4,7 @@ from tqdm import tqdm
 import argparse
 from helpers import params2cpu, save_params
 from external import densify
-from ..definitions import ROOT_PATH
+from src.definitions import ROOT_PATH
 from train_utils import initialize_params, initialize_optimizer, initialize_per_timestep, \
     initialize_post_first_timestep, get_batch, get_loss, report_progress, get_custom_dataset
 
