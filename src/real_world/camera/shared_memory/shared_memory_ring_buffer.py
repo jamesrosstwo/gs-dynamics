@@ -6,8 +6,8 @@ import time
 from multiprocessing.managers import SharedMemoryManager
 import numpy as np
 
-from real_world.camera.shared_memory.shared_ndarray import SharedNDArray
-from real_world.camera.shared_memory.shared_memory_util import ArraySpec, SharedAtomicCounter
+from src.real_world.camera.shared_memory.shared_ndarray import SharedNDArray
+from src.real_world.camera.shared_memory.shared_memory_util import ArraySpec, SharedAtomicCounter
 
 class SharedMemoryRingBuffer:
     """

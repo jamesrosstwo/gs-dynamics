@@ -1,13 +1,9 @@
-import cv2
 import argparse
 import time
-import numpy as np
-import torch
 import open3d as o3d
-from PIL import Image
 
-from utils.real_env import RealEnv
-from utils.pcd_utils import get_tabletop_points, visualize_o3d
+from src.real_world.utils.real_env import RealEnv
+from src.real_world.utils.pcd_utils import get_tabletop_points, visualize_o3d
 
 def construct_goal_from_perception():
     use_robot = True

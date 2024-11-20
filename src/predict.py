@@ -10,10 +10,10 @@ import yaml
 from pathlib import Path
 from tqdm import tqdm
 
-from render.renderer import Renderer
-from render.dynamics_module import DynamicsModule
-from render.utils import Visualizer, project, convert_opencv_to_opengl
-from data.utils import rgba_to_rgb
+from src.render.renderer import Renderer
+from src.render.dynamics_module import DynamicsModule
+from src.render.utils import Visualizer, project, convert_opencv_to_opengl
+from src.data.utils import rgba_to_rgb
 
 
 def load_valid_paths(dataset):

@@ -1,6 +1,5 @@
 import argparse
 import torch
-import numpy as np
 from tqdm import tqdm
 
 from real_world.gs.external import densify

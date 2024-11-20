@@ -1,11 +1,13 @@
-import torch
-import json
-from tqdm import tqdm
 import argparse
-from helpers import params2cpu, save_params
-from external import densify
+import json
+
+import torch
+from tqdm import tqdm
+
+from src.tracking.external import densify
+from src.tracking.helpers import params2cpu, save_params
 from src.definitions import ROOT_PATH
-from train_utils import initialize_params, initialize_optimizer, initialize_per_timestep, \
+from src.tracking.train_utils import initialize_params, initialize_optimizer, initialize_per_timestep, \
     initialize_post_first_timestep, get_batch, get_loss, report_progress, get_custom_dataset
 
 

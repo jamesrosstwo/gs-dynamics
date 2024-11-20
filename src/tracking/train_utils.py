@@ -4,9 +4,9 @@ import copy
 from PIL import Image
 from random import randint
 from diff_gaussian_rasterization import GaussianRasterizer as Renderer
-from helpers import setup_camera, l1_loss_v1, l1_loss_v2, weighted_l2_loss_v1, weighted_l2_loss_v2, quat_mult, o3d_knn, \
+from src.tracking.helpers import setup_camera, l1_loss_v1, l1_loss_v2, weighted_l2_loss_v1, weighted_l2_loss_v2, quat_mult, o3d_knn, \
     params2rendervar
-from external import calc_ssim, calc_psnr, build_rotation, update_params_and_optimizer
+from src.tracking.external import calc_ssim, calc_psnr, build_rotation, update_params_and_optimizer
 from src.definitions import ROOT_PATH
 
 

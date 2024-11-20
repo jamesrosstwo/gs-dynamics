@@ -5,11 +5,11 @@ import time
 import os
 import yaml
 
-from utils.real_env import RealEnv
-from utils.perception_module import PerceptionModule
-from utils.pcd_utils import visualize_o3d
-from gs.trainer import GSTrainer
-from render.dynamics_module import DynamicsModule
+from src.real_world.utils.real_env import RealEnv
+from src.real_world.utils.perception_module import PerceptionModule
+from src.real_world.utils.pcd_utils import visualize_o3d
+from src.real_world.gs.trainer import GSTrainer
+from src.render.dynamics_module import DynamicsModule
 
 def init_env():
     use_robot = True

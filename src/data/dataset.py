@@ -9,8 +9,8 @@ import torch
 from torch.utils.data import Dataset
 from dgl.geometry import farthest_point_sampler
 
-from data.utils import fps_rad_idx
-from real_world.utils.pcd_utils import rpy_to_rotation_matrix
+from src.data.utils import fps_rad_idx
+from src.real_world.utils.pcd_utils import rpy_to_rotation_matrix
 
 
 def load_pairs(pairs_path, episode_idx):

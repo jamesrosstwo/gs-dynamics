@@ -5,10 +5,10 @@ import open3d as o3d
 from tqdm import tqdm
 from dgl.geometry import farthest_point_sampler
 
-from gnn.model import DynamicsPredictor
-from data.dataset import construct_edges_from_states, load_eef_pos
-from data.utils import fps_rad_idx_torch
-from render.utils import interpolate_motions, relations_to_matrix
+from src.gnn.model import DynamicsPredictor
+from src.data.dataset import construct_edges_from_states, load_eef_pos
+from src.data.utils import fps_rad_idx_torch
+from src.render.utils import interpolate_motions, relations_to_matrix
 
 
 

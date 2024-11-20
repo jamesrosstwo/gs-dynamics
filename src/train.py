@@ -1,22 +1,16 @@
-import glob
 import numpy as np
 import argparse
 import yaml
 import os
 import time
-import sys
 import torch
-import torchvision
-import torchvision.transforms as transforms
 import torch.nn.functional as F
 from torch.utils.data import DataLoader
 
-sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
-from gnn.model import DynamicsPredictor
-from gnn.utils import set_seed, umeyama_algorithm
-from data.dataset import DynDataset
+from src.gnn.model import DynamicsPredictor
+from src.gnn.utils import set_seed, umeyama_algorithm
+from src.data.dataset import DynDataset
 
-import glob
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt

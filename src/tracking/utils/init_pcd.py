@@ -3,7 +3,7 @@ import cv2
 import numpy as np
 import open3d as o3d
 import argparse
-from my_utils import depth2fgpcd, np2o3d
+from src.tracking.utils.my_utils import depth2fgpcd, np2o3d
 
 t = 1000
 num_cam = 4

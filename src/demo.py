@@ -20,15 +20,15 @@ from PIL import Image
 from diff_gaussian_rasterization import GaussianRasterizer
 from diff_gaussian_rasterization import GaussianRasterizationSettings as Camera
 
-from real_world.utils.pcd_utils import visualize_o3d
-from real_world.utils.gradio_utils import (draw_mask_on_image, draw_points_on_image,
+from src.real_world.utils.pcd_utils import visualize_o3d
+from src.real_world.utils.gradio_utils import (draw_mask_on_image, draw_points_on_image,
                           draw_raw_points_on_image,
                           get_latest_points_pair, get_valid_mask,
                           on_change_single_global_state)
-from real_world.gs.trainer import GSTrainer, make_video
-from real_world.gs.helpers import setup_camera
-from real_world.gs.convert import save_to_splat
-from render.dynamics_module import DynamicsModule
+from src.real_world.gs.trainer import GSTrainer, make_video
+from src.real_world.gs.helpers import setup_camera
+from src.real_world.gs.convert import save_to_splat
+from src.render.dynamics_module import DynamicsModule
 
 
 def project(points, intr, extr):
