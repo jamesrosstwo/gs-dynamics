@@ -229,7 +229,7 @@ def inverse_sigmoid(x):
 def densify(params, variables, optimizer, i, remove_thresh, remove_thresh_5k, scale_scene_radius):
     """
     Adjusts the density of points based on various conditions and thresholds.
-
+R
     Parameters:
     - params: A dictionary containing parameters.
     - variables: A dictionary containing various variables.
