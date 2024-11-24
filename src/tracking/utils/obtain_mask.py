@@ -6,6 +6,7 @@ import torch
 import cv2
 from torch.utils.data import Dataset, DataLoader
 from PIL import Image
+from src.definitions import ROOT_PATH
 
 nodename = os.uname().nodename
 
@@ -189,9 +190,9 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # cfg
-    config_file = "../../third-party/GroundingDINO/groundingdino/config/GroundingDINO_SwinB_cfg.py"
-    grounded_checkpoint = "../../weights/groundingdino_swinb_cogcoor.pth"
-    sam_checkpoint = "../../weights/sam_vit_h_4b8939.pth"
+    config_file = ROOT_PATH / "third-party/GroundingDINO/groundingdino/config/GroundingDINO_SwinB_cfg.py"
+    grounded_checkpoint = ROOT_PATH / "weights/groundingdino_swinb_cogcoor.pth"
+    sam_checkpoint = ROOT_PATH / "weights/sam_vit_h_4b8939.pth"
     data_path = args.data_path
     text_prompt = args.text_prompt
 
